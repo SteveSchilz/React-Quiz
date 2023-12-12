@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-
+import { useEffect, useRef, useReducer, useState } from "react";
+import DateCounter from "./DateCounter.js";
 export default function App() {
-  return <div>Hello React</div>;
+  return (
+    <div>
+      <DateCounter />
+    </div>
+  );
 }
