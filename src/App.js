@@ -2,6 +2,8 @@ import { useEffect, useReducer } from "react";
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Loader from "./Loader.js";
+import StartScreen from "./StartScreen.js";
+import Question from "./Question.js";
 
 // STATUSES: loading, error, ready, active, finished
 
@@ -12,12 +14,16 @@ const initialState = {
 
 // ACTIONS:
 // * dataReceived: fetch data completed.
+// * dataFailed:   failed to fetch data
+// * start:        begin quiz
 function reducer(state, action) {
   switch (action.type) {
     case "dataReceived":
       return { ...state, status: "ready", questions: action.payload };
     case "dataFailed":
       return { ...state, status: "error", questions: [] };
+    case "start":
+      return { ...state, status: "active" };
     case "":
       return { ...state };
     default:
@@ -26,7 +32,8 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // Note that we Destructure state into question and status.
+  const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
 
   useEffect(function () {
     fetch("http://localhost:8000/questions")
@@ -35,14 +42,23 @@ export default function App() {
       .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
 
+  function handleStart() {
+    dispatch({ type: "start" });
+  }
+
   return (
     <div className="app">
       <Header />
       <Main>
         <p>1/15</p>
-        {state.status === "loading" && <Loader />}
-        {state.status === "ready" && <p>Ready</p>}
-        {state.status === "error" && <p>Error!</p>}
+        {status === "loading" && <Loader />}
+        {status === "ready" && (
+          <StartScreen length={questions.length} handleStart={handleStart} />
+        )}
+        {status === "active" && <Question q={questions[0]} />}
+        {status === "error" && (
+          <p>Error! (Make sure json-server is running with "npm run server"</p>
+        )}
       </Main>
     </div>
   );
