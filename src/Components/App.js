@@ -12,6 +12,7 @@ const initialState = {
   questions: [],
   status: "loading",
   current: 0,
+  answer: null,
 };
 
 // ACTIONS:
@@ -28,6 +29,12 @@ function reducer(state, action) {
       return { ...state, status: "active", current: 0 };
     case "setCurrent":
       return { ...state, current: action.payload };
+    case "newAnswer":
+      const question = state.questions[state.current];
+      return {
+        ...state,
+        answer: action.payload,
+      };
     case "":
       return { ...state };
     default:
@@ -37,7 +44,7 @@ function reducer(state, action) {
 
 export default function App() {
   // Note that we Destructure state into question and status.
-  const [{ questions, status, current }, dispatch] = useReducer(
+  const [{ questions, status, current, answer }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -80,6 +87,8 @@ export default function App() {
               q={questions[current]}
               handlePrevious={handlePrevious}
               handleNext={handleNext}
+              dispatch={dispatch}
+              answer={answer}
             />
           </>
         )}
