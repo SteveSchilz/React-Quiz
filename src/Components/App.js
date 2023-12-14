@@ -2,6 +2,7 @@ import { useEffect, useReducer } from "react";
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Loader from "./Loader.js";
+import NextButton from "./NextButton.js";
 import Progress from "./Progress.js";
 import StartScreen from "./StartScreen.js";
 import Question from "./Question.js";
@@ -40,6 +41,10 @@ function reducer(state, action) {
             ? state.points + question.points
             : state.points,
       };
+    case "nextQuestion":
+      if (state.index < state.questions.length)
+        return { ...state, index: state.index + 1, answer: null };
+      else return state;
     case "":
       return { ...state };
     default:
@@ -95,6 +100,7 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
+            <NextButton dispatch={dispatch} answer={answer} />
           </>
         )}
         {status === "error" && (
