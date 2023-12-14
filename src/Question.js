@@ -1,9 +1,13 @@
-export default function Question({ q }) {
-  console.log("Question: " + q);
+import Options from "./Options.js";
+
+export default function Question({ q, handleNext, handlePrevious }) {
   return (
-    <>
-      <h2>Question Component</h2>
-      <h3>H3</h3>
-    </>
+    <div>
+      <h4>Question: {q.question}</h4>
+      <Options options={q.options} />
+      <button>Check</button>
+      <button onClick={handlePrevious}>Previous</button>
+      <button onClick={handleNext}>Next</button>
+    </div>
   );
 }
