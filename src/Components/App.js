@@ -13,6 +13,7 @@ const initialState = {
   status: "loading",
   current: 0,
   answer: null,
+  points: 0,
 };
 
 // ACTIONS:
@@ -34,6 +35,10 @@ function reducer(state, action) {
       return {
         ...state,
         answer: action.payload,
+        points:
+          action.payload === question.correctOption
+            ? state.points + question.points
+            : state.points,
       };
     case "":
       return { ...state };
