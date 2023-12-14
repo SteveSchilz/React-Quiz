@@ -5,6 +5,7 @@ import Loader from "./Loader.js";
 import NextButton from "./NextButton.js";
 import Progress from "./Progress.js";
 import StartScreen from "./StartScreen.js";
+import FinishScreen from "./FinishScreen.js";
 import Question from "./Question.js";
 
 // STATUSES: loading, error, ready, active, finished
@@ -15,6 +16,7 @@ const initialState = {
   index: 0,
   answer: null,
   points: 0,
+  highScore: 0,
 };
 
 // ACTIONS:
@@ -45,6 +47,15 @@ function reducer(state, action) {
       if (state.index < state.questions.length)
         return { ...state, index: state.index + 1, answer: null };
       else return state;
+    case "finish":
+      return {
+        ...state,
+        status: "finished",
+        highScore:
+          state.points > state.highScore ? state.points : state.highScore,
+      };
+    case "restart":
+      return { ...state, status: "ready", index: 0, points: 0, answer: null };
     case "":
       return { ...state };
     default:
@@ -54,10 +65,8 @@ function reducer(state, action) {
 
 export default function App() {
   // Note that we Destructure state into question and status.
-  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ questions, status, index, answer, points, highScore }, dispatch] =
+    useReducer(reducer, initialState);
 
   useEffect(function () {
     fetch("http://localhost:8000/questions")
@@ -106,8 +115,21 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton dispatch={dispatch} answer={answer} />
+            <NextButton
+              index={index}
+              numQuestions={numQuestions}
+              dispatch={dispatch}
+              answer={answer}
+            />
           </>
+        )}
+        {status === "finished" && (
+          <FinishScreen
+            points={points}
+            maxPoints={maxPoints}
+            highScore={highScore}
+            dispatch={dispatch}
+          />
         )}
         {status === "error" && (
           <p>Error! (Make sure json-server is running with "npm run server"</p>
