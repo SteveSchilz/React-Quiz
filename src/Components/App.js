@@ -80,16 +80,6 @@ export default function App() {
   function handleStart() {
     dispatch({ type: "start" });
   }
-  function handlePrevious() {
-    if (index > 0) {
-      dispatch({ type: "setCurrent", payload: index - 1 });
-    }
-  }
-  function handleNext() {
-    if (index < numQuestions) {
-      dispatch({ type: "setCurrent", payload: index + 1 });
-    }
-  }
 
   return (
     <div className="app">
@@ -110,8 +100,6 @@ export default function App() {
             />
             <Question
               q={questions[index]}
-              handlePrevious={handlePrevious}
-              handleNext={handleNext}
               dispatch={dispatch}
               answer={answer}
             />

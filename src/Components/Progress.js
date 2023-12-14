@@ -13,7 +13,6 @@ function Progress({ index, numQuestions, points, maxPoints, answer }) {
           {points} / {maxPoints}{" "}
         </strong>
       </p>
-      <span>===</span>
     </header>
   );
 }
