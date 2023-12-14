@@ -54,7 +54,7 @@ function reducer(state, action) {
 
 export default function App() {
   // Note that we Destructure state into question and status.
-  const [{ questions, status, index, answer }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -67,7 +67,7 @@ export default function App() {
   }, []);
 
   const numQuestions = questions.length;
-
+  const maxPoints = questions.reduce((prev, cur) => prev + cur.points, 0);
   function handleStart() {
     dispatch({ type: "start" });
   }
@@ -92,7 +92,13 @@ export default function App() {
         )}
         {status === "active" && (
           <>
-            <Progress current={index} length={numQuestions} />
+            <Progress
+              index={index}
+              numQuestions={numQuestions}
+              points={points}
+              maxPoints={maxPoints}
+              answer={answer}
+            />
             <Question
               q={questions[index]}
               handlePrevious={handlePrevious}
