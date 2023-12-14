@@ -11,7 +11,7 @@ import Question from "./Question.js";
 const initialState = {
   questions: [],
   status: "loading",
-  current: 0,
+  index: 0,
   answer: null,
   points: 0,
 };
@@ -27,11 +27,11 @@ function reducer(state, action) {
     case "dataFailed":
       return { ...state, status: "error", questions: [] };
     case "start":
-      return { ...state, status: "active", current: 0 };
+      return { ...state, status: "active", index: 0 };
     case "setCurrent":
-      return { ...state, current: action.payload };
+      return { ...state, index: action.payload };
     case "newAnswer":
-      const question = state.questions[state.current];
+      const question = state.questions[state.index];
       return {
         ...state,
         answer: action.payload,
@@ -49,7 +49,7 @@ function reducer(state, action) {
 
 export default function App() {
   // Note that we Destructure state into question and status.
-  const [{ questions, status, current, answer }, dispatch] = useReducer(
+  const [{ questions, status, index, answer }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -67,13 +67,13 @@ export default function App() {
     dispatch({ type: "start" });
   }
   function handlePrevious() {
-    if (current > 0) {
-      dispatch({ type: "setCurrent", payload: current - 1 });
+    if (index > 0) {
+      dispatch({ type: "setCurrent", payload: index - 1 });
     }
   }
   function handleNext() {
-    if (current < numQuestions) {
-      dispatch({ type: "setCurrent", payload: current + 1 });
+    if (index < numQuestions) {
+      dispatch({ type: "setCurrent", payload: index + 1 });
     }
   }
 
@@ -87,9 +87,9 @@ export default function App() {
         )}
         {status === "active" && (
           <>
-            <Progress current={current} length={numQuestions} />
+            <Progress current={index} length={numQuestions} />
             <Question
-              q={questions[current]}
+              q={questions[index]}
               handlePrevious={handlePrevious}
               handleNext={handleNext}
               dispatch={dispatch}
