@@ -1,5 +1,5 @@
 function FinishScreen({ points, maxPoints, highScore, dispatch }) {
-  const percent = Math.ceil(points / maxPoints) * 100;
+  const percent = Math.ceil((points / maxPoints) * 100);
 
   let emoji;
   if (percent === 100) emoji = "🥇";

@@ -1,5 +1,6 @@
 import { useEffect, useReducer } from "react";
 import Header from "./Header.js";
+import Footer from "./Footer.js";
 import Main from "./Main.js";
 import Loader from "./Loader.js";
 import NextButton from "./NextButton.js";
@@ -7,8 +8,12 @@ import Progress from "./Progress.js";
 import StartScreen from "./StartScreen.js";
 import FinishScreen from "./FinishScreen.js";
 import Question from "./Question.js";
+import Timer from "./Timer.js";
 
+// ACTIONS:
 // STATUSES: loading, error, ready, active, finished
+
+const QUESTION_TIMEOUT = 20;
 
 const initialState = {
   questions: [],
@@ -17,6 +22,7 @@ const initialState = {
   answer: null,
   points: 0,
   highScore: 0,
+  secondsRemaining: QUESTION_TIMEOUT,
 };
 
 // ACTIONS:
@@ -30,7 +36,12 @@ function reducer(state, action) {
     case "dataFailed":
       return { ...state, status: "error", questions: [] };
     case "start":
-      return { ...state, status: "active", index: 0 };
+      return {
+        ...state,
+        status: "active",
+        index: 0,
+        secondsRemaining: state.questions.length * QUESTION_TIMEOUT,
+      };
     case "setCurrent":
       return { ...state, index: action.payload };
     case "newAnswer":
@@ -55,7 +66,19 @@ function reducer(state, action) {
           state.points > state.highScore ? state.points : state.highScore,
       };
     case "restart":
-      return { ...state, status: "ready", index: 0, points: 0, answer: null };
+      return {
+        ...state,
+        status: "ready",
+        index: 0,
+        points: 0,
+        answer: null,
+      };
+    case "tick":
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining > 0 ? state.status : "finished",
+      };
     case "":
       return { ...state };
     default:
@@ -64,9 +87,17 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  // Note that we Destructure state into question and status.
-  const [{ questions, status, index, answer, points, highScore }, dispatch] =
-    useReducer(reducer, initialState);
+  // Call useReducer Holds all of our state in one place.
+  // @param reducer:  state control function, must return a new state
+  // @param initialState: the initial state object
+  //
+  // @returns [stateObj, dispatch funcion]
+  //
+  // Note that we immediately destructure the returned state into individual variables
+  const [
+    { questions, status, index, answer, points, highScore, secondsRemaining },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
   useEffect(function () {
     fetch("http://localhost:8000/questions")
@@ -77,9 +108,6 @@ export default function App() {
 
   const numQuestions = questions.length;
   const maxPoints = questions.reduce((prev, cur) => prev + cur.points, 0);
-  function handleStart() {
-    dispatch({ type: "start" });
-  }
 
   return (
     <div className="app">
@@ -87,7 +115,7 @@ export default function App() {
       <Main>
         {status === "loading" && <Loader />}
         {status === "ready" && (
-          <StartScreen length={numQuestions} handleStart={handleStart} />
+          <StartScreen length={numQuestions} dispatch={dispatch} />
         )}
         {status === "active" && (
           <>
@@ -103,12 +131,15 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton
-              index={index}
-              numQuestions={numQuestions}
-              dispatch={dispatch}
-              answer={answer}
-            />
+            <Footer>
+              <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} />
+              <NextButton
+                index={index}
+                numQuestions={numQuestions}
+                dispatch={dispatch}
+                answer={answer}
+              />
+            </Footer>
           </>
         )}
         {status === "finished" && (
@@ -120,7 +151,7 @@ export default function App() {
           />
         )}
         {status === "error" && (
-          <p>Error! (Make sure json-server is running with "npm run server"</p>
+          <p>Error! (Make sure json-server is running with "npm run server")</p>
         )}
       </Main>
     </div>
