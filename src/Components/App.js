@@ -40,6 +40,8 @@ function reducer(state, action) {
         ...state,
         status: "active",
         index: 0,
+        points: 0,
+        answer: null,
         secondsRemaining: state.questions.length * QUESTION_TIMEOUT,
       };
     case "setCurrent":
@@ -68,7 +70,8 @@ function reducer(state, action) {
     case "restart":
       return {
         ...state,
-        status: "ready",
+        status:
+          "ready" /* We go through ready state, user clicks start to begin */,
         index: 0,
         points: 0,
         answer: null,
@@ -77,7 +80,6 @@ function reducer(state, action) {
       return {
         ...state,
         secondsRemaining: state.secondsRemaining - 1,
-        status: state.secondsRemaining > 0 ? state.status : "finished",
       };
     case "":
       return { ...state };

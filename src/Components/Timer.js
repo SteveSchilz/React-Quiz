@@ -10,14 +10,16 @@ function Timer({ secondsRemaining, dispatch }) {
   useEffect(
     function doTimer() {
       const id = setInterval(function () {
-        dispatch({ type: "tick" });
+        secondsRemaining > 0
+          ? dispatch({ type: "tick" })
+          : dispatch({ type: "finish" });
       }, 1000);
 
       // Cancel the previous timer in the cleanup function
       return () => clearInterval(id);
     },
 
-    [dispatch]
+    [dispatch, secondsRemaining]
   );
 
   return <div className="timer">{formatTime(secondsRemaining)}</div>;
